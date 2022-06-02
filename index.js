@@ -8,7 +8,7 @@ const generateHTML = require('./src/generateHTML');
 const managerQuestions = [{
     type: 'input',
     name: 'name',
-    message: "What is the name of the manager",
+    message: "What is the name of the manager?",
 }, {
     type: 'input',
     name: 'email',
@@ -16,12 +16,12 @@ const managerQuestions = [{
 },
 {
     type: 'input',
-    name: 'employee id',
+    name: 'id',
     message: "How is the employee id?",
 },
 {
     type: 'input',
-    name: 'office number',
+    name: 'officeNumber',
     message: "What is the office number?",
 }
 ];
@@ -29,7 +29,7 @@ const managerQuestions = [{
 const engineerQuestions = [{
     type: 'input',
     name: 'name',
-    message: "What is the name of the engineer",
+    message: "What is the name of the engineer?",
 }, {
     type: 'input',
     name: 'email',
@@ -37,20 +37,20 @@ const engineerQuestions = [{
 },
 {
     type: 'input',
-    name: 'employee id',
+    name: 'id',
     message: "How is the employee id?",
 },
 {
     type: 'input',
     name: 'github',
-    message: "What is the github of engineer?",
+    message: "What is the github username of engineer?",
 }
 ];
 
 const internQuestions = [{
     type: 'input',
     name: 'name',
-    message: "What is the name of the intern",
+    message: "What is the name of the intern?",
 }, {
     type: 'input',
     name: 'email',
@@ -58,7 +58,7 @@ const internQuestions = [{
 },
 {
     type: 'input',
-    name: 'employee id',
+    name: 'id',
     message: "How is the employee id?",
 },
 {
@@ -69,30 +69,66 @@ const internQuestions = [{
 ];
 
 const menuOptions = [{
-    type: 'confirm',
-    name: 'add-employee',
+    type: 'list',
+    name: 'addEmployee',
     message: 'Do you want to add an employee?',
-    when: ""
+    choices: ['Engineer', 'Intern', 'No']
+}
+];
 
+let employees = [];
 
-},
-{
-    type: 'when',
-    name: 'add-employee',
-    message: 'Do you want to add an employee?'
-},
-{
-    type: 'confirm',
-    name: 'add-employee',
-    message: 'Do you want to add an employee?'
+const promptManagerQuestions = () => {
+    return inquirer.prompt(managerQuestions);
 }
 
-]
+const promptEngineerQuestions = () => {
+    return inquirer.prompt(engineerQuestions);
+}
+
+const promptInternQuestions = () => {
+    return inquirer.prompt(internQuestions);
+}
 
 // run manager questions first
-// then run main menu with options to..
-// Do you want to add an employee - yes: engineer or intern -no: quit to file
-// Engineer
-// Intern
-// Do you want to add an intern
-// quit- write to file
+promptManagerQuestions()
+    .then(answers => {
+        const { name, id, email, officeNumber } = answers;
+        employees.push(new Manager(name, id, email, officeNumber));
+        addEmployee();
+    })
+
+function addEmployee() {
+    // then run main menu with options
+    return inquirer.prompt(menuOptions)
+    .then(answers => {
+        // Do you want to add an employee - yes: engineer or intern -no: quit to file
+		if (answers.addEmployee == 'Engineer')
+    // Do you want to add an Engineer
+			promptEngineerQuestions()
+				.then(answers => {
+					const {name, id, email, github} = answers;
+					employees.push(new Engineer(name, id, email, github));	
+					addEmployee();	
+				});
+		else if (answers.addEmployee == 'Intern')
+        // Do you want to add an Intern
+			promptInternQuestions()
+				.then(answers => {
+					const {name, id, email, school} = answers;
+					employees.push(new Intern(name, id, email, school));
+					addEmployee();
+				});
+		else if (answers.addEmployee == 'No')
+        // Do you want to add an employee -no: quit- write to file
+			generateHTMLtoFile();
+
+	});
+}
+
+function generateHTMLtoFile() {
+    fs.writeFile('./dist/index.html', generateHTML(employees), err => {console.log(err);});
+}
+
+
+
