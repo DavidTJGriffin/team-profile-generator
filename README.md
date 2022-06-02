@@ -12,7 +12,7 @@ This command-line program lets you generate cards for your various employees int
 
 ## Installation
 
-[video]()
+[video](https://watch.screencastify.com/v/vgSl8OpWimcUiOPwV777)
 
 1. Clone the repo to local machine
 2. Check into this repo directory from command-line
